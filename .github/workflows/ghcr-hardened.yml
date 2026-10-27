@@ -15,11 +15,6 @@ on:
         required: true
         default: "v0.21.1"
         type: string
-  schedule:
-    - cron: "0 3 * * 1"
-  push:
-    paths:
-      - ".github/workflows/ghcr-hardened.yml"
 
 permissions:
   contents: read
@@ -31,10 +26,6 @@ env:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        variant: [sqlite, postgres]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout upstream at tag
@@ -71,7 +62,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           pull: true
           push: true
-          build-args: FEATURES=${{ matrix.variant }}
+          build-args: FEATURES=postgres
           tags: |
-            ${{ env.IMAGE }}:${{ inputs.upstream_tag || 'v0.21.1' }}${{ matrix.variant == 'postgres' && '-postgres' || '' }}
-            ${{ env.IMAGE }}:${{ matrix.variant == 'postgres' && 'postgres' || 'latest' }}
+            ${{ env.IMAGE }}:${{ inputs.upstream_tag }}-postgres
+            ${{ env.IMAGE }}:postgres
